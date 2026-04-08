@@ -1,15 +1,40 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { end_points } from "../services/api"
 
 const Login = () => {
   const [user, setUser] = useState("")
   const [password, setPassword] = useState("")
   const [remerber, setRemember] = useState(false)
+  const [users, setUsers] = useState([])
 
-  function signIn(e){
-    /* e.preventDefault() */
-    if(user === "" || password === "") return alert("Login or password is empty")
-    if(user == "admin" && password == "admin") return alert("welcome admin")
-    if(user != "admin" && password != "admin") return alert("Login or password is incorrect")
+  function getUsers() {
+
+    fetch(end_points.users)
+      .then((response) => response.json())
+      .then((data) => setUsers(data))
+      .catch(error => console.log(error))
+
+
+  }
+
+  useEffect(() => {
+    getUsers()
+  }, [])
+
+  function findUser() {
+
+    let auth = users.find((item) => user == item.username &&
+      password == item.password)
+      return auth
+
+
+  }
+
+  function signIn(e) {
+    e.preventDefault()
+    if (user === "" || password === "") return alert("Login or password is empty")
+    if (findUser()) return alert("welcome admin")
+    if (findUser() == "undefined") return alert("Login or password is incorrect")
   }
   return (
     <div className="form-login-container">
@@ -28,7 +53,7 @@ const Login = () => {
               id="username"
               name="username"
               type="text"
-              onChange={(e)=>{setUser(e.target.value)}}
+              onChange={(e) => { setUser(e.target.value) }}
             />
           </div>
           <div>
@@ -38,7 +63,7 @@ const Login = () => {
               id="password"
               name="password"
               type="password"
-              onChange={()=> setPassword(!remerber)}
+              onChange={() => setPassword(!remerber)}
             />
           </div>
           <div class="flex items-center justify-between">
@@ -48,7 +73,7 @@ const Login = () => {
                 id="remember"
                 name="remember"
                 type="checkbox"
-                onChange={(e)=>{setRemember(e.target.value)}}
+                onChange={(e) => { setRemember(e.target.value) }}
               />
               <span class="text-slate-500">Remember me </span>
             </div>
@@ -61,8 +86,8 @@ const Login = () => {
             id="login"
             name="login"
             type="button"
-            /* onClick={(e)=> signIn(e)} */
-            onClick={signIn}
+            /* onClick={(e) => signIn(e)} */
+          onClick={signIn}
           >
             login
           </button>
